@@ -1,0 +1,1 @@
+Rightware Logger Implementation
