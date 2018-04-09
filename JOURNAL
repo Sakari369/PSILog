@@ -174,3 +174,7 @@ LOG(Logger::MSG) << "Sakari is here";
 Let's start with this kind of simple implementation.
 We can then figure out how to use it globally
 We are going to anyway need a instance of the logger class somewhere.
+
+Take some hints from this implementation:
+
+https://stackoverflow.com/questions/40273809/how-to-write-iostream-like-interface-to-logging-library/40424272#40424272
