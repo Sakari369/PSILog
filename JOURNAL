@@ -114,3 +114,63 @@ How about multithreading ?
 What would this mean ?
 
 I guess it means the output to the same output from different threads should be somehow mutex locked.
+
+
+Mon Apr  9 11:10:04 EEST 2018
+============================
+
+Would it be still easier and better just to overload << for the logger for output?
+This is going to be mainly a C++ library after all, and using << for strings and also user objects is more intuitive than figuring out what method we should implement for each user defined type.
+
+The only downside is that << doesn't immediately work with scripting languages for example, but we could just define some methods that are bound.
+
+Basically..
+
+We would then need just to replace the output path with a stream.
+Also would be beneficial for not having to figure out different methods for different outputs, we could just forward the logging into the stream we are using to output to. But how would we then define a log level for the message?
+
+What if we want to have different log levels for each message?
+Like .. ok this is a fatal message, and this is just a warning?
+What if we want to just log the fatal messages ?
+
+unique_ptr<Logger> logger = make_unique<Logger()>;
+if (logger) {
+	logger->set_log_level(Logger::MSG || Logger::INFO || Logger::WARN);
+
+	//logger->set_output_path("console");
+	//logger->set_output_path("https://localhost.dev:3000/log");
+	logger->set_output_path("/tmp/test_log_01.txt");
+}
+
+logger->log(Logger::INFO, "All systems initialized");
+logger->log(Logger::CMD, "Set warp speed to 7");
+
+logger << log_msg(Logger::INFO, "All systems initialized");
+
+log << { Logger::INFO, "All systems initialized" };
+
+We could of course do something like this.
+
+log << "We have done it now":
+
+log(Logger::MSG, "We have done it now");
+
+For the user defined types though we could just log the string version of that class also.
+But then we would have to define some kind of base class that is used for logging the user types.
+
+we could do something like this though too:
+
+log(Logger::INFO) << "The user " << sakari << " has logged in ":
+
+How would we initialize this class then ?
+Do we want to have a global instance of the class ?
+
+Let's start implementing and see how the usage goes naturally.
+
+logger->set_log_level(Logger::MSG || Logger::INFO || Logger::WARN);
+logger->set_output_stream(stdout);
+LOG(Logger::MSG) << "Sakari is here";
+
+Let's start with this kind of simple implementation.
+We can then figure out how to use it globally
+We are going to anyway need a instance of the logger class somewhere.
