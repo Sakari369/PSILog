@@ -252,20 +252,27 @@ Okay, basic console output implemented.
 TODO:
 	- Implement file outputter
 		- Basic version done
+		- Done
 
 	- Multiple output support
 		- Done
 
 	- Test and support logging user types
 		- Create a class that has overwritten << so that we can override it	
+		- Done
 
 	- Multithreading safety
+		- 
+
 	- Write tests
+		- Writing tests for C++ ? Easiest way is to just implement the tests as C++ subproject that uses the logger and verifies the operations
+
 	- Document API
+		- Write README.MD that details how to use the API
 
 Wut next.
 File outputter would be pretty easy to implement.
 
 Okay we have very basic file output.
-
 Let's test logging user types.
+Works.
