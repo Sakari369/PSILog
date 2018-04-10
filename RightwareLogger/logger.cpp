@@ -2,11 +2,11 @@
 #include "logger.h"
 
 Logger::Logger() {
-	std::cout << "Logger created" << std::endl;
+	//std::cout << "Logger created" << std::endl;
 }
 
 Logger::~Logger() {
-	std::cout << "Logger destroyed" << std::endl;
+	//std::cout << "Logger destroyed" << std::endl;
 }
 
 // Flush our output stream to our target destination
@@ -21,7 +21,9 @@ void Logger::flush() {
 	// So, we dispatch the log message to our outputter
 	// We should also have a default outputter if none is assigned that outputs to the console
 	// And we should
-	_outputter->write_log_entry(_output_stream.str(), _log_level);
+	for (const auto &outputter : _outputters) {
+		outputter->write_log_entry(_output_stream.str(), _log_level);
+	}
 
 	// Clear it
 	_output_stream.str( std::string() );
@@ -30,7 +32,7 @@ void Logger::flush() {
 
 bool Logger::add_output(std::unique_ptr<LoggerOutput> output) {
 	//assert(output != nullptr);
-	_outputter = std::move(output);
+	_outputters.push_back(std::move(output));
 }
 
 void Logger::set_log_level(int log_level) {
@@ -51,11 +53,11 @@ void Logger::set_log_filter(int log_filter) {
 
 // Default console output implementation
 LoggerConsoleOutput::LoggerConsoleOutput() {
-	fprintf(stderr, "Initialized ConsoleOutput\n");
+	//fprintf(stderr, "Initialized ConsoleOutput\n");
 }
 
 LoggerConsoleOutput::~LoggerConsoleOutput() {
-	fprintf(stderr, "Destroyed ConsoleOutput\n");
+	//fprintf(stderr, "Destroyed ConsoleOutput\n");
 }
 
 // Write the the log entry to our output
@@ -71,7 +73,7 @@ bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry, int log_
 
 // Default file output implementation
 LoggerFileOutput::LoggerFileOutput(const char *output_path) {
-	fprintf(stderr, "Initialized FileOutput with output_path = %s\n", output_path);
+	//fprintf(stderr, "Initialized FileOutput with output_path = %s\n", output_path);
 
 	_output_path = output_path;
 
@@ -80,8 +82,7 @@ LoggerFileOutput::LoggerFileOutput(const char *output_path) {
 }
 
 LoggerFileOutput::~LoggerFileOutput() {
-	fprintf(stderr, "Destroyed FileOutput\n");
-
+	//fprintf(stderr, "Destroyed FileOutput\n");
 	// Close our file
 	_fs.close();
 }

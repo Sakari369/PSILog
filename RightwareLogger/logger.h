@@ -5,10 +5,15 @@
 #include <sstream>
 #include <string>
 #include <fstream>
+#include <vector>
 #include <stdio.h>
 
 // Implementation for C++11
 #include "make_unique.h"
+
+using std::unique_ptr;
+using std::make_unique;
+using std::move;
 
 class LoggerOutput;
 class LoggerConsoleOutput;
@@ -74,7 +79,7 @@ public:
 
 	// Add new logger to our output chain
 	// Basically we would like to own this as an unique_ptr
-	bool add_output(std::unique_ptr<LoggerOutput> output);
+	bool add_output(unique_ptr<LoggerOutput> output);
 
         // Accessors
         int get_log_level() const;
@@ -93,7 +98,7 @@ private:
 
 	// Our log message outputters chain
 	// We dispatch the actual log messages to these in sequential order
-	std::unique_ptr<LoggerOutput> _outputter;
+	std::vector<unique_ptr<LoggerOutput>> _outputters;
 
 	// The stream where we buffer our log messages until flushing
         std::stringstream _output_stream;
