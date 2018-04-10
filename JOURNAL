@@ -251,10 +251,21 @@ Okay, basic console output implemented.
 
 TODO:
 	- Implement file outputter
+		- Basic version done
+
+	- Multiple output support
+		- Done
+
 	- Test and support logging user types
+		- Create a class that has overwritten << so that we can override it	
+
 	- Multithreading safety
 	- Write tests
 	- Document API
 
 Wut next.
 File outputter would be pretty easy to implement.
+
+Okay we have very basic file output.
+
+Let's test logging user types.
