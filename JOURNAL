@@ -178,3 +178,13 @@ We are going to anyway need a instance of the logger class somewhere.
 Take some hints from this implementation:
 
 https://stackoverflow.com/questions/40273809/how-to-write-iostream-like-interface-to-logging-library/40424272#40424272
+
+Tue Apr 10 10:42:28 EEST 2018
+============================
+
+So, how do we filter the logging output according to the logging level properly ?
+
+Let's agree that we do the filtering runtime.
+We don't want to have compile time filtering, as this would require recompiling the project each time we change the log level.
+
+We can have a define that figures out if we completely disable the logging, and then optimizes the logging operations away completely.
