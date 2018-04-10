@@ -6,9 +6,15 @@
 #include <string>
 #include <stdio.h>
 
-class Logger {
-public:
+// Implementation for C++11
+#include "make_unique.h"
 
+class LoggerOutput;
+class LoggerConsoleOutput;
+
+class Logger {
+
+public:
         enum LogLevel {
                 NONE	= 0,
                 INFO	= 1,
@@ -20,16 +26,6 @@ public:
         Logger();
         ~Logger();
 
-
-	// So, if we would like to just ignore the log messages when log filter doesn't match
-	// to the current logging level
-	// So, basically we could implement this like this:
-	// Either define a function that is called in all these overloads that checks
-	// if the current logging level matches that of the log filter, and return if not.
-	// Or, define some kind of macro that checks the filtering level before even actually calling <<
-	// The flush() should only be called if the log level matches the filter
-
-        // For types that implement <<
         template<class T>
 	Logger& operator << (const T& output) {
 		if (_log_level & _log_filter) {
@@ -48,7 +44,7 @@ public:
 
 			// Check if we should flush the output
 			if (manip == static_cast<ManipFn>(std::flush)
-					|| manip == static_cast<ManipFn>(std::endl)) {
+			 || manip == static_cast<ManipFn>(std::endl)) {
 				this->flush();
 			}
 		}
@@ -72,14 +68,19 @@ public:
                 return *this;
         }
 
+	// Flush the output to our output class
+	void flush();
+
+	// Add new logger to our output chain
+	// Basically we would like to own this as an unique_ptr
+	bool add_output(std::unique_ptr<LoggerOutput> output);
+
         // Accessors
         int get_log_level() const;
         void set_log_level(int log_level);
 
         int get_log_filter() const;
         void set_log_filter(int log_filter);
-
-        void flush();
 
 private:
 	// The current log level we are logging messages with
@@ -89,5 +90,30 @@ private:
 	// log level. Binary logic.
         int _log_filter = LogLevel::INFO;
 
+	// Our log message outputters chain
+	// We dispatch the actual log messages to these in sequential order
+	std::unique_ptr<LoggerOutput> _outputter;
+
+	// The stream where we buffer our log messages until flushing
         std::stringstream _output_stream;
+};
+
+// Super class for implementing logger outputs
+//
+class LoggerOutput {
+public:
+	LoggerOutput() = default;
+	~LoggerOutput() = default;
+
+	virtual bool write_log_entry(const std::string &log_entry) = 0;
+	//virtual void clear_log();
+};
+
+// Default implementation of outputting log messages to the console
+class LoggerConsoleOutput : public LoggerOutput {
+public:
+	LoggerConsoleOutput();
+	~LoggerConsoleOutput();
+
+	bool write_log_entry(const std::string &log_entry) override;
 };
