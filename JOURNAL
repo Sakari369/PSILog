@@ -188,3 +188,71 @@ Let's agree that we do the filtering runtime.
 We don't want to have compile time filtering, as this would require recompiling the project each time we change the log level.
 
 We can have a define that figures out if we completely disable the logging, and then optimizes the logging operations away completely.
+
+Okay, so we have basic functionality working already.
+
+How about setting the output stream ?
+Do we want to set the output stream ?
+
+If we we just set the stream, this would mean we would have to open a file manually and pass it to the logger.
+We don't really want to do that.
+
+So.. Maybe we should do something like this:
+
+logger.add_output(Logger::FileOutput("/tmp/log.txt", FLAGS);
+logger.add_output(Logger::ConsoleOutput(std::cerr));
+
+This way we can provide a base class that implements the outputter, and then extend that to provide default mechanisms for outputting the log messages. This could mean the user of this API could also extend the outputter easily, providing mechanisms for example sending SMS messages or transmitting the logs to another server or whatever you need to do.
+
+So, let's implement a really simple LoggerOutput class that implements these basics.
+What methods would we need for this class ?
+
+- init
+	- Implement in constructor
+	- Closing happens in destructor
+
+- dispatch
+	- Send or dispatch the log messages to the destination
+
+Well that is the very basic of it.
+We would need to support output to multiple destinations also, and multithreading support.
+Where would we have to take multithreading into account ? Either in the flush() of the Logger or in the actual implementation of the outputter classes.
+
+So, we would need to keep a list of outputs.
+We can add them in sequential order, and each log message is formatted within the Logger, and then dispatched when flushing to our outputs in the order they were added.
+
+Let's implement first a basic class for outputting to stdout
+And implement it just as a static object, after that works implement as a std::vector<LoggerOutput> or such.
+
+How about implementing the LoggerOutput ?
+Should we override the << operator also in here ?
+
+Or just implement .dispatch()
+Is there any benefit in either ?
+
+LoggerFileOutput file_output("/tmp/log.txt", FLAGS);
+file_output << "[16:32:20] Dem Engines be on Fire!\n";
+
+It's not really clear here what happens.
+Is the output written to the file ? Or buffered ?
+Should probably be cleaner just to implement 
+
+write_log_entry();
+
+So it is more clear.
+The internal implementation might buffer the output for example for a while, or do something else with it.
+If we overwrite <<, we are assuming that the output is going to be handled right away.
+
+Besides, the logger class handles the conversion of the user data objects also to strings or any format that is required for the LoggerOutput classes to handle.
+
+Let's assume we are only writing string data.
+
+Okay, basic console output implemented.
+
+TODO:
+	- Implement file outputter
+	- Test and support logging user types
+	- Multithreading safety
+	- Write tests
+	- Document API
+
