@@ -7,11 +7,12 @@ int main(int argc, char *argv[]) {
 	Logger logger;
 
 	logger.set_log_filter(Logger::INFO | Logger::WARN | Logger::ERR);
-	logger.add_output(std::move(std::make_unique<LoggerConsoleOutput>()));
+	//logger.add_output(std::move(std::make_unique<LoggerConsoleOutput>()));
+	logger.add_output(std::move(std::make_unique<LoggerFileOutput>("/tmp/log_test.txt")));
 
 	logger(Logger::INFO) << "All systems initialized" << std::endl;
 	logger(Logger::WARN) << "WARNING: Phasers damaged" << std::endl;
-	logger(Logger::ERR) << "ERROR: Failed to boot phasers" << std::endl;
+	logger(Logger::ERR)  << "ERROR: Failed to boot phasers" << std::endl;
 
 	return 0;
 }

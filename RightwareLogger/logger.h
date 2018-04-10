@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <fstream>
 #include <stdio.h>
 
 // Implementation for C++11
@@ -117,4 +118,17 @@ public:
 	~LoggerConsoleOutput();
 
 	bool write_log_entry(const std::string &log_entry, int log_level) override;
+};
+
+// Default implementation of outputting to a file
+class LoggerFileOutput : public LoggerOutput {
+public:
+	LoggerFileOutput(const char *output_path);
+	~LoggerFileOutput();
+
+	bool write_log_entry(const std::string &log_entry, int log_level) override;
+
+private:
+	const char *_output_path = "";
+	std::fstream _fs;
 };

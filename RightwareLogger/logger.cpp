@@ -68,3 +68,28 @@ bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry, int log_
 
 	return true;
 }
+
+// Default file output implementation
+LoggerFileOutput::LoggerFileOutput(const char *output_path) {
+	fprintf(stderr, "Initialized FileOutput with output_path = %s\n", output_path);
+
+	_output_path = output_path;
+
+	// Open the file for appending at the end of the log file
+	_fs.open(output_path, std::fstream::out | std::fstream::app);
+}
+
+LoggerFileOutput::~LoggerFileOutput() {
+	fprintf(stderr, "Destroyed FileOutput\n");
+
+	// Close our file
+	_fs.close();
+}
+
+// Write the the log entry to our output
+bool LoggerFileOutput::write_log_entry(const std::string &log_entry, int log_level) {
+	_fs << log_entry;
+	_fs.flush();
+
+	return true;
+}
