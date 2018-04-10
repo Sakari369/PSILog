@@ -21,7 +21,7 @@ void Logger::flush() {
 	// So, we dispatch the log message to our outputter
 	// We should also have a default outputter if none is assigned that outputs to the console
 	// And we should
-	_outputter->write_log_entry(_output_stream.str());
+	_outputter->write_log_entry(_output_stream.str(), _log_level);
 
 	// Clear it
 	_output_stream.str( std::string() );
@@ -59,7 +59,12 @@ LoggerConsoleOutput::~LoggerConsoleOutput() {
 }
 
 // Write the the log entry to our output
-bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry) {
-	std::cout << log_entry;
+bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry, int log_level) {
+	if (log_level == Logger::ERR) {
+		std::cerr << log_entry;
+	} else {
+		std::cout << log_entry;
+	}
+
 	return true;
 }

@@ -105,7 +105,8 @@ public:
 	LoggerOutput() = default;
 	~LoggerOutput() = default;
 
-	virtual bool write_log_entry(const std::string &log_entry) = 0;
+	// TODO: maybe use a struct for the log entry
+	virtual bool write_log_entry(const std::string &log_entry, int log_level) = 0;
 	//virtual void clear_log();
 };
 
@@ -115,5 +116,5 @@ public:
 	LoggerConsoleOutput();
 	~LoggerConsoleOutput();
 
-	bool write_log_entry(const std::string &log_entry) override;
+	bool write_log_entry(const std::string &log_entry, int log_level) override;
 };
