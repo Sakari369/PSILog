@@ -1,4 +1,7 @@
 #include <memory>
+#include <thread>
+#include <chrono>
+#include <future>
 
 #include "logger.h"
 
@@ -36,15 +39,15 @@ int main(int argc, char *argv[]) {
 	Logger logger;
 
 	// Set filtering level, binary arithmetic
-	logger.set_log_filter(Logger::INFO | Logger::WARN | Logger::ERR);
+	//logger.set_log_filter(Logger::INFO | Logger::WARN | Logger::ERR);
+	logger.set_log_filter(Logger::ALL);
 
 	// TODO: would be it more clear to do the move insde add_output ?
 	logger.add_output(move(make_unique<LoggerConsoleOutput>()));
-	//logger.add_output(move(make_unique<LoggerFileOutput>("/tmp/log_test.txt")));
+	logger.add_output(move(make_unique<LoggerFileOutput>("/tmp/log_test.txt")));
 
 	// Example idea of how to log into a network service
 	//logger.add_output(move(make_unique<LoggerXhrOutput>("https://127.0.0.1:3000/log", auth_info);
-
 	logger(Logger::INFO) << "All systems initialized" << std::endl;
 	logger(Logger::WARN) << "WARNING: Phasers damaged" << std::endl;
 	logger(Logger::ERR)  << "ERROR: Failed to boot phasers" << std::endl;
@@ -53,6 +56,35 @@ int main(int argc, char *argv[]) {
 	WarpDrive drive;
 	drive.set_status(WarpDrive::ACTIVE);
 	logger(Logger::INFO) << drive << std::endl;
+
+	// Test out threading
+	// lambda function for testing
+	auto t_func = [&logger] (int level) {
+		logger(Logger::FREQ)  << "Phaser levels at over " << level << ", stabilizing ..";
+		logger.flush_stream();
+		std::this_thread::sleep_for(std::chrono::milliseconds(500 + level*100));
+		logger(Logger::FREQ)  << ".. done" << std::endl;
+	};
+
+	int num_threads = 6;
+
+	for (int i=0; i<num_threads; i++) {
+		std::thread t1(t_func, i);
+		t1.join();
+	}
+
+	int timeout = 3000;
+
+	/*
+	std::thread([timeout, t_func]() {
+	    std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+	    t_func(9000);
+	}).detach();
+	*/
+
+	logger(Logger::INFO)  << "Shutting down all systems ..." << std::endl;
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+	logger(Logger::INFO)  << "Shutdown complete" << std::endl;
 
 	return 0;
 }

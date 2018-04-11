@@ -13,28 +13,20 @@ Logger::~Logger() {
 	//std::cout << "Logger destroyed" << std::endl;
 }
 
-// Flush our output stream to our target destination
-void Logger::flush() {
-	// We assume that log messages are text
-	// So, we dispatch the log message to our outputter
-
-	// TODO:
-	// We should also have a default outputter if none is assigned that outputs to the console
-	// And we should
-
-	std::string log_entry = format_log_entry(_output_stream.str());
-
+// Flush our log stream to our target output destinations
+void Logger::flush_stream() {
 	// Dispatch the log entry to all of our outputters
+	// This operation will make sure the message is flushed also to the destination stream also
 	for (const auto &outputter : _outputters) {
-		outputter->write_log_entry(log_entry, _log_level);
+		outputter->write_log_entry(_log_stream.str(), _log_level);
 	}
 
-	// Clear our output stream after writing
-	_output_stream.str( std::string() );
-	_output_stream.clear();
+	// Clear our output stream after dispatching
+	_log_stream.str( std::string() );
+	_log_stream.clear();
 }
 
-std::string Logger::format_log_entry(const std::string &log_entry) const {
+std::string Logger::get_log_entry_prefix(const std::string &log_entry) const {
 	std::string formatted;
 	std::stringstream ss;
 
@@ -43,15 +35,16 @@ std::string Logger::format_log_entry(const std::string &log_entry) const {
 	auto tm = *std::localtime(&t);
 	ss << std::put_time(&tm, "[%H:%M:%S] ");
 
-	formatted = ss.str() + log_entry;
-
-	return formatted;
+	return ss.str();
 }
 
 // Add output destination to our chain of outputs
+// TODO: do we use return value ?
 bool Logger::add_output(std::unique_ptr<LoggerOutput> output) {
 	assert(output != nullptr);
 	_outputters.push_back(std::move(output));
+
+	return true;
 }
 
 // Set the currently active log level for logging messages
@@ -84,8 +77,10 @@ LoggerConsoleOutput::~LoggerConsoleOutput() {
 bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry, int log_level) {
 	if (log_level == Logger::ERR) {
 		std::cerr << log_entry;
+		std::cerr.flush();
 	} else {
 		std::cout << log_entry;
+		std::cout.flush();
 	}
 
 	return true;

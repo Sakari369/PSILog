@@ -22,11 +22,12 @@ class Logger {
 
 public:
         enum LogLevel {
-                NONE	= 0,
-                INFO	= 1,
-                WARN	= 2,
-                ERR	= 2 << 1,
-                FREQ	= 2 << 2
+		NONE	=  0,
+		INFO	=  1,
+		WARN	=  2,
+		ERR	=  2 << 1,
+		FREQ	=  2 << 2,
+		ALL	= (2 << 3) - 1
         };
 
         Logger();
@@ -34,8 +35,17 @@ public:
 
         template<class T>
 	Logger& operator << (const T& output) {
+		// Append log string into our log stream
 		if (_log_level & _log_filter) {
-			_output_stream << output;
+			// If the log output hasn't been flushed to the destination yet, append
+			// log entry prefix to the stream
+			if (_new_entry == true) {
+				std::string prefix = get_log_entry_prefix(_log_stream.str());
+				_log_stream << prefix;
+				_new_entry = false;
+			}
+
+			_log_stream << output;
 		}
 
                 return *this;
@@ -45,13 +55,16 @@ public:
 	typedef std::ostream& (*ManipFn)(std::ostream &);
 	Logger& operator << (ManipFn manip) {
 		if (_log_level & _log_filter) {
-			// Apply the operation
-			manip(_output_stream);
+			// Apply the string operation
+			manip(_log_stream);
 
-			// Check if we should flush the output
+			// Should we flush the log stream ?
+			// This will signal the underlying outputters to flush the output to whatever
+			// they are writing it to
 			if (manip == static_cast<ManipFn>(std::flush)
 			 || manip == static_cast<ManipFn>(std::endl)) {
-				this->flush();
+				this->flush_stream();
+				_new_entry = true;
 			}
 		}
 
@@ -62,7 +75,7 @@ public:
 	typedef std::ios_base& (*FlagsFn)(std::ios_base &);
 	Logger& operator << (FlagsFn manip) {
 		if (_log_level & _log_filter) {
-			manip(_output_stream);
+			manip(_log_stream);
 		}
 
                 return *this;
@@ -75,9 +88,9 @@ public:
         }
 
 	// Flush the output to our output class
-	void flush();
+	void flush_stream();
 
-	std::string format_log_entry(const std::string &log_entry) const;
+	std::string get_log_entry_prefix(const std::string &log_entry) const;
 
 	// Add new logger to our output chain
 	// Basically we would like to own this as an unique_ptr
@@ -98,23 +111,30 @@ private:
 	// log level. Binary logic.
         int _log_filter = LogLevel::INFO;
 
+	// Used to detect if we should append the prefix to the entry or not
+	bool _new_entry = true;
+
 	// Our log message outputters chain
 	// We dispatch the actual log messages to these in sequential order
+	// TODO: We should also have a default outputter if none is assigned that outputs to the console
 	std::vector<unique_ptr<LoggerOutput>> _outputters;
 
 	// The stream where we buffer our log messages until flushing
-        std::stringstream _output_stream;
+	std::stringstream _log_stream;
 };
 
 // Super class for implementing logger outputs
-//
 class LoggerOutput {
 public:
 	LoggerOutput() = default;
 	~LoggerOutput() = default;
 
 	// TODO: maybe use a struct for the log entry
+
+	// This will write the current log entry to the destination output, ensuring that
+	// the output is flushed also
 	virtual bool write_log_entry(const std::string &log_entry, int log_level) = 0;
+
 	//virtual void clear_log();
 };
 
