@@ -3,7 +3,6 @@
 #include "logger.h"
 
 // A custom user type, for testing out logging user types
-
 class WarpDrive {
 public:
 	enum DriveStatus {
@@ -36,10 +35,15 @@ int main(int argc, char *argv[]) {
 	//std::unique_ptr<Logger> logger = std::make_unique<Logger>();
 	Logger logger;
 
+	// Set filtering level, binary arithmetic
 	logger.set_log_filter(Logger::INFO | Logger::WARN | Logger::ERR);
 
+	// TODO: would be it more clear to do the move insde add_output ?
 	logger.add_output(move(make_unique<LoggerConsoleOutput>()));
-	logger.add_output(move(make_unique<LoggerFileOutput>("/tmp/log_test.txt")));
+	//logger.add_output(move(make_unique<LoggerFileOutput>("/tmp/log_test.txt")));
+
+	// Example idea of how to log into a network service
+	//logger.add_output(move(make_unique<LoggerXhrOutput>("https://127.0.0.1:3000/log", auth_info);
 
 	logger(Logger::INFO) << "All systems initialized" << std::endl;
 	logger(Logger::WARN) << "WARNING: Phasers damaged" << std::endl;

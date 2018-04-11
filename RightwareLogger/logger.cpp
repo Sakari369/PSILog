@@ -1,4 +1,8 @@
 #include <assert.h>
+#include <iomanip>
+#include <ctime>
+#include <sstream>
+
 #include "logger.h"
 
 Logger::Logger() {
@@ -10,31 +14,47 @@ Logger::~Logger() {
 }
 
 // Flush our output stream to our target destination
-// Here we should limit the output according the current output level ?
-// Actually we shouldn't even store the log messages if the filter level
-// Is limiting that
 void Logger::flush() {
-	// Log to console for now
-	//std::cout << _output_stream.str();
-
 	// We assume that log messages are text
 	// So, we dispatch the log message to our outputter
+
+	// TODO:
 	// We should also have a default outputter if none is assigned that outputs to the console
 	// And we should
+
+	std::string log_entry = format_log_entry(_output_stream.str());
+
+	// Dispatch the log entry to all of our outputters
 	for (const auto &outputter : _outputters) {
-		outputter->write_log_entry(_output_stream.str(), _log_level);
+		outputter->write_log_entry(log_entry, _log_level);
 	}
 
-	// Clear it
+	// Clear our output stream after writing
 	_output_stream.str( std::string() );
 	_output_stream.clear();
 }
 
+std::string Logger::format_log_entry(const std::string &log_entry) const {
+	std::string formatted;
+	std::stringstream ss;
+
+	// Append time to the entry
+	auto t = std::time(nullptr);
+	auto tm = *std::localtime(&t);
+	ss << std::put_time(&tm, "[%H:%M:%S] ");
+
+	formatted = ss.str() + log_entry;
+
+	return formatted;
+}
+
+// Add output destination to our chain of outputs
 bool Logger::add_output(std::unique_ptr<LoggerOutput> output) {
-	//assert(output != nullptr);
+	assert(output != nullptr);
 	_outputters.push_back(std::move(output));
 }
 
+// Set the currently active log level for logging messages
 void Logger::set_log_level(int log_level) {
 	_log_level = log_level;
 }
@@ -60,7 +80,7 @@ LoggerConsoleOutput::~LoggerConsoleOutput() {
 	//fprintf(stderr, "Destroyed ConsoleOutput\n");
 }
 
-// Write the the log entry to our output
+// Write the the log entry to console
 bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry, int log_level) {
 	if (log_level == Logger::ERR) {
 		std::cerr << log_entry;

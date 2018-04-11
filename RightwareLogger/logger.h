@@ -77,6 +77,8 @@ public:
 	// Flush the output to our output class
 	void flush();
 
+	std::string format_log_entry(const std::string &log_entry) const;
+
 	// Add new logger to our output chain
 	// Basically we would like to own this as an unique_ptr
 	bool add_output(unique_ptr<LoggerOutput> output);
