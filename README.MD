@@ -74,5 +74,7 @@ The target environment to be used was C++11, leveraging modern features like uni
 
 ## Future features and ideas how to improve the current version
 
-o brief description of the work sample including rationale behind the implementation, as well
-as its possible shortcomings and known issues o ideas for further development
+TODO:
+ * Would have to make a macro out of the actual call to add the line number and function name there
+ * Optimize the macro out if NDEBUG or such defined, so that the compiler optimizes the calls out completely if we don't want any
+   logging
