@@ -261,11 +261,6 @@ TODO:
 		- Create a class that has overwritten << so that we can override it	
 		- Done
 
-	- Multithreading safety
-		- 
-
-	- Write tests
-		- Writing tests for C++ ? Easiest way is to just implement the tests as C++ subproject that uses the logger and verifies the operations
 
 	- Document API
 		- Write README.MD that details how to use the API
@@ -276,3 +271,38 @@ File outputter would be pretty easy to implement.
 Okay we have very basic file output.
 Let's test logging user types.
 Works.
+
+
+Wed Apr 11 10:38:55 EEST 2018
+============================
+
+Remains to be implemented
+
+	- Timestamping & prefixing
+		- Set some default log prefix
+		- Simple timestamping added
+		- DONE
+	
+	- Multithreading safety
+		- What do we have to take into account ?
+		- Basically not accessing the same resources from multiple threads
+
+		- On what level do we have to take this into account ?
+			- Individual outputs or at the actual logger interface level ?
+			- Implement this at the logger interface level, as outputting to any destination should not happen at the same
+			  time, we should not share the same output resource from multiple threads
+
+		- Write some loops that output until ESC is pressed, calling the same function from multiple threads
+
+	- Add a default outputter to the console, if none is specified
+
+	- Write tests
+		- Writing tests for C++ ? Easiest way is to just implement the tests as C++ subproject that uses the logger and verifies the operations
+
+
+How would we write the macro when we don't have a global function?
+Maybe add that to the list of TODO items.
+
+Just add a timestamp for now
+
+
