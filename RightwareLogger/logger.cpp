@@ -15,6 +15,19 @@ Logger::~Logger() {
 	//std::cout << "Logger destroyed" << std::endl;
 }
 
+void Logger::log(const std::string &entry) {
+	// If the log output hasn't been flushed to the destination yet, append
+	// log entry prefix to the stream
+	if (_flushed == true) {
+		std::string prefix = get_log_entry_prefix(_log_stream.str());
+		std::thread::id this_id = std::this_thread::get_id();
+		_log_stream << prefix << " " << this_id << " ";
+		_flushed = false;
+	}
+
+	_log_stream << entry;
+}
+
 // Flush our log stream to our target output destinations
 void Logger::flush() {
 	// Dispatch the log entry to all of our outputters
