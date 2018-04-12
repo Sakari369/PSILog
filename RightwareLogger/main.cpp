@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
 	// lambda function for testing threading
 	auto t_func1 = [&logger] (int level) {
-		int delay = 500 + level*500;
+		int delay = 500 + level*250;
 		logger(Logger::FREQ)  << "Stabilizing phaser " << level << ", time remaining = " << delay << " ms" << std::endl;
 		std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 		logger(Logger::FREQ)  << "Phaser " << level << " stabilized." << std::endl;
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 	// Test threading
 	// How would we test launch these so that they are attempting to write at the same time ?
 	// Would have to add messages to the logger at the same time
-	for (int i=0; i<12; i++) {
+	for (int i=0; i<6; i++) {
 		std::thread t1(t_func1, i);
 		std::thread t2(t_func2, i*2);
 		std::thread t3(t_func2, i*3);
@@ -81,7 +81,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	logger(Logger::INFO)  << "All phasers stabilized" << std::endl;
-
 	logger(Logger::INFO)  << "Shutting down all systems ..." << std::endl;
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 	logger(Logger::INFO)  << "Shutdown complete" << std::endl;

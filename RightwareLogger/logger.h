@@ -66,9 +66,6 @@ private:
 	// log level. Binary logic.
         int _log_filter = LogLevel::INFO;
 
-	// Have we flushed the current log stream ?
-	bool _flushed = false;
-
 	std::mutex _mutex;
 
 	// Our log message outputters chain
