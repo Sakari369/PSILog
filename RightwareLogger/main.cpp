@@ -35,7 +35,6 @@ private:
 };
 
 int main(int argc, char *argv[]) {
-	//std::unique_ptr<Logger> logger = std::make_unique<Logger>();
 	Logger logger;
 
 	// Set filtering level, binary arithmetic
@@ -57,30 +56,32 @@ int main(int argc, char *argv[]) {
 	drive.set_status(WarpDrive::ACTIVE);
 	logger(Logger::INFO) << drive << std::endl;
 
-	// Test out threading
-	// lambda function for testing
-	auto t_func = [&logger] (int level) {
-		logger(Logger::FREQ)  << "Phaser levels at over " << level << ", stabilizing ..";
-		logger.flush_stream();
-		std::this_thread::sleep_for(std::chrono::milliseconds(500 + level*100));
-		logger(Logger::FREQ)  << ".. done" << std::endl;
+	// lambda function for testing threading
+	auto t_func1 = [&logger] (int level) {
+		int delay = 500 + level*100;
+		logger(Logger::FREQ)  << "Stabilizing phaser " << level << ", time remaining = " << delay << " ms";
+		logger.flush();
+		std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+		logger(Logger::FREQ)  << "Phaser " << level << " stabilized." << std::endl;
 	};
 
-	int num_threads = 6;
+	auto t_func2 = [&logger] (int level) {
+		logger(Logger::FREQ)  << "Phaser " << level*10 << " ready, stabilizing immediately" << std::endl;
+	};
 
-	for (int i=0; i<num_threads; i++) {
-		std::thread t1(t_func, i);
+	// Test threading
+	// How would we test launch these so that they are attempting to write at the same time ?
+	// Would have to add messages to the logger at the same time
+	for (int i=0; i<6; i++) {
+		std::thread t1(t_func1, i);
+		std::thread t2(t_func2, i*2);
+		//std::thread t3(t_func2, i*3);
 		t1.join();
+		t2.join();
+		//t3.join();
 	}
 
-	int timeout = 3000;
-
-	/*
-	std::thread([timeout, t_func]() {
-	    std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-	    t_func(9000);
-	}).detach();
-	*/
+	logger(Logger::INFO)  << "All phasers stabilized" << std::endl;
 
 	logger(Logger::INFO)  << "Shutting down all systems ..." << std::endl;
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));

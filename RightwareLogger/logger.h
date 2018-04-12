@@ -63,7 +63,7 @@ public:
 			// they are writing it to
 			if (manip == static_cast<ManipFn>(std::flush)
 			 || manip == static_cast<ManipFn>(std::endl)) {
-				this->flush_stream();
+				this->flush();
 				_new_entry = true;
 			}
 		}
@@ -88,7 +88,7 @@ public:
         }
 
 	// Flush the output to our output class
-	void flush_stream();
+	void flush();
 
 	std::string get_log_entry_prefix(const std::string &log_entry) const;
 

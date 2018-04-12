@@ -14,7 +14,7 @@ Logger::~Logger() {
 }
 
 // Flush our log stream to our target output destinations
-void Logger::flush_stream() {
+void Logger::flush() {
 	// Dispatch the log entry to all of our outputters
 	// This operation will make sure the message is flushed also to the destination stream also
 	for (const auto &outputter : _outputters) {
