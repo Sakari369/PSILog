@@ -23,24 +23,41 @@ LogStream Logger::operator ()(int log_level) {
 	return LogStream(*this, log_level);
 }
 
+/*
 void Logger::log(const std::string &entry) {
 	// If the log output hasn't been flushed to the destination yet, append
 	// log entry prefix to the stream
 	if (_flushed == true) {
-		std::string prefix = get_log_entry_prefix(_log_stream.str());
+		std::string prefix = get_log_entry_prefix(entry);
 		std::thread::id this_id = std::this_thread::get_id();
 		_log_stream << prefix << " " << this_id << " ";
 		_flushed = false;
 	}
 
 	_log_stream << entry;
+	std::cout << _log_stream.str();
+	for (const auto &outputter : _outputters) {
+		outputter->write_log_entry(_log_stream.str(), _log_level);
+	}
+}
+*/
+
+void Logger::log(const std::string &entry, int log_level) {
+	std::stringstream entry_ss;
+	std::string prefix = get_log_entry_prefix(entry);
+	std::thread::id thread_id = std::this_thread::get_id();
+
+	entry_ss << prefix << "[" << thread_id << "] " << entry;
+	for (const auto &outputter : _outputters) {
+		outputter->write_log_entry(entry_ss.str(), log_level);
+	}
 }
 
 // Flush our log stream to our target output destinations
+/*
 void Logger::flush() {
 	// Dispatch the log entry to all of our outputters
 	// This operation will make sure the message is flushed also to the destination stream also
-
 	for (const auto &outputter : _outputters) {
 		outputter->write_log_entry(_log_stream.str(), _log_level);
 	}
@@ -50,6 +67,7 @@ void Logger::flush() {
 	_log_stream.clear();
 	_flushed = true;
 }
+*/
 
 std::string Logger::get_log_entry_prefix(const std::string &log_entry) const {
 	std::string formatted;
@@ -100,8 +118,6 @@ LoggerConsoleOutput::~LoggerConsoleOutput() {
 
 // Write the the log entry to console
 bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry, int log_level) {
-	//std::lock_guard<std::mutex> guard(_mutex);
-
 	if (log_level == Logger::ERR) {
 		std::cerr << log_entry;
 		std::cerr.flush();
@@ -131,6 +147,8 @@ LoggerFileOutput::~LoggerFileOutput() {
 
 // Write the the log entry to our output
 bool LoggerFileOutput::write_log_entry(const std::string &log_entry, int log_level) {
+	std::lock_guard<std::mutex> guard(_mutex);
+
 	_fs << log_entry;
 	_fs.flush();
 

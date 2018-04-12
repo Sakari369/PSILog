@@ -34,69 +34,16 @@ public:
         Logger();
         ~Logger();
 
-	/*
-        template<class T>
-	Logger& operator << (const T& output) {
-		std::stringstream entry;
-
-		if (_log_level & _log_filter) {
-			entry << output;
-			log(entry.str());
-		}
-
-                return *this;
-        }
-	*/
-
-	// Manipulation functions, endl, flush, setw etc
-	/*
-	typedef std::ostream& (*ManipFn)(std::ostream &);
-	Logger& operator << (ManipFn manip) {
-		if (_log_level & _log_filter) {
-			// Apply the string operation
-			manip(_log_stream);
-
-			// Should we flush the log stream ?
-			// This will signal the underlying outputters to flush the output to whatever
-			// they are writing it to
-			if (manip == static_cast<ManipFn>(std::flush)
-			 || manip == static_cast<ManipFn>(std::endl)) {
-				this->flush();
-			}
-		}
-
-                return *this;
-        }
-
-	// For setiosflags, resetiosflags
-	typedef std::ios_base& (*FlagsFn)(std::ios_base &);
-	Logger& operator << (FlagsFn manip) {
-		if (_log_level & _log_filter) {
-			manip(_log_stream);
-		}
-
-                return *this;
-	}
-	*/
-
 	// Functors for returning a log stream
 	LogStream operator ()();
 	LogStream operator ()(int log_level);
 
-	// For setting the log level while calling as a functor
-	/*
-	Logger& operator () (LogLevel log_level) {
-                _log_level = log_level;
-                return *this;
-        }
-	*/
-
 	// Public methods
 
-	void log(const std::string &entry);
+	void log(const std::string &entry, int log_level);
 
 	// Flush the output to our output class
-	void flush();
+	//void flush();
 
 	std::string get_log_entry_prefix(const std::string &log_entry) const;
 
@@ -130,7 +77,7 @@ private:
 	std::vector<unique_ptr<LoggerOutput>> _outputters;
 
 	// The stream where we buffer our log messages until flushing
-	std::stringstream _log_stream;
+	//std::stringstream _log_stream;
 };
 
 // Stream class for thread safety
@@ -148,8 +95,53 @@ public:
 	{}
 
 	~LogStream() {
-		_logger.log(str());
+		_logger.log(str(), _log_level);
 	}
+
+	/*
+	template<class T>
+	Logger& operator << (const T& output) {
+		std::stringstream entry;
+
+		if (_log_level & _log_filter) {
+			entry << output;
+			log(entry.str());
+		}
+
+		return *this;
+	}
+	*/
+
+	// Manipulation functions, endl, flush, setw etc
+	/*
+	typedef std::ostream& (*ManipFn)(std::ostream &);
+	Logger& operator << (ManipFn manip) {
+		if (_log_level & _log_filter) {
+			// Apply the string operation
+			manip(_log_stream);
+
+			// Should we flush the log stream ?
+			// This will signal the underlying outputters to flush the output to whatever
+			// they are writing it to
+			if (manip == static_cast<ManipFn>(std::flush)
+			 || manip == static_cast<ManipFn>(std::endl)) {
+				this->flush();
+			}
+		}
+
+		return *this;
+	}
+
+	// For setiosflags, resetiosflags
+	typedef std::ios_base& (*FlagsFn)(std::ios_base &);
+	Logger& operator << (FlagsFn manip) {
+		if (_log_level & _log_filter) {
+			manip(_log_stream);
+		}
+
+		return *this;
+	}
+	*/
 
 private:
 	Logger &_logger;
