@@ -15,6 +15,14 @@ Logger::~Logger() {
 	//std::cout << "Logger destroyed" << std::endl;
 }
 
+LogStream Logger::operator ()() {
+	return LogStream(*this, LogLevel::INFO);
+}
+
+LogStream Logger::operator ()(int log_level) {
+	return LogStream(*this, log_level);
+}
+
 void Logger::log(const std::string &entry) {
 	// If the log output hasn't been flushed to the destination yet, append
 	// log entry prefix to the stream
@@ -40,6 +48,7 @@ void Logger::flush() {
 	// Clear our output stream after dispatching
 	_log_stream.str( std::string() );
 	_log_stream.clear();
+	_flushed = true;
 }
 
 std::string Logger::get_log_entry_prefix(const std::string &log_entry) const {

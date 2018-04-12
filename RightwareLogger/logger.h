@@ -17,6 +17,7 @@ using std::move;
 
 class LoggerOutput;
 class LoggerConsoleOutput;
+class LogStream;
 
 class Logger {
 
@@ -33,11 +34,11 @@ public:
         Logger();
         ~Logger();
 
+	/*
         template<class T>
 	Logger& operator << (const T& output) {
 		std::stringstream entry;
 
-		// Append log string into our log stream
 		if (_log_level & _log_filter) {
 			entry << output;
 			log(entry.str());
@@ -45,8 +46,10 @@ public:
 
                 return *this;
         }
+	*/
 
 	// Manipulation functions, endl, flush, setw etc
+	/*
 	typedef std::ostream& (*ManipFn)(std::ostream &);
 	Logger& operator << (ManipFn manip) {
 		if (_log_level & _log_filter) {
@@ -59,7 +62,6 @@ public:
 			if (manip == static_cast<ManipFn>(std::flush)
 			 || manip == static_cast<ManipFn>(std::endl)) {
 				this->flush();
-				_flushed = true;
 			}
 		}
 
@@ -75,12 +77,21 @@ public:
 
                 return *this;
 	}
+	*/
+
+	// Functors for returning a log stream
+	LogStream operator ()();
+	LogStream operator ()(int log_level);
 
 	// For setting the log level while calling as a functor
+	/*
 	Logger& operator () (LogLevel log_level) {
                 _log_level = log_level;
                 return *this;
         }
+	*/
+
+	// Public methods
 
 	void log(const std::string &entry);
 
@@ -120,6 +131,29 @@ private:
 
 	// The stream where we buffer our log messages until flushing
 	std::stringstream _log_stream;
+};
+
+// Stream class for thread safety
+class LogStream : public std::ostringstream {
+public:
+	// Store reference to the current log level and logger object
+	LogStream(Logger &logger, int log_level) :
+		_logger(logger), _log_level(log_level)
+	{}
+
+	// Copy constructor
+	LogStream(const LogStream &ls) :
+		_logger(ls._logger),
+		_log_level(ls._log_level)
+	{}
+
+	~LogStream() {
+		_logger.log(str());
+	}
+
+private:
+	Logger &_logger;
+	int _log_level;
 };
 
 // Super class for implementing logger outputs
