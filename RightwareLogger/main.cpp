@@ -59,8 +59,7 @@ int main(int argc, char *argv[]) {
 	// lambda function for testing threading
 	auto t_func1 = [&logger] (int level) {
 		int delay = 500 + level*100;
-		logger(Logger::FREQ)  << "Stabilizing phaser " << level << ", time remaining = " << delay << " ms";
-		logger.flush();
+		logger(Logger::FREQ)  << "Stabilizing phaser " << level << ", time remaining = " << delay << " ms" << std::endl;
 		std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 		logger(Logger::FREQ)  << "Phaser " << level << " stabilized." << std::endl;
 	};

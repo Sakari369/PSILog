@@ -39,10 +39,12 @@ public:
 		if (_log_level & _log_filter) {
 			// If the log output hasn't been flushed to the destination yet, append
 			// log entry prefix to the stream
-			if (_new_entry == true) {
+			if (_flushed == true) {
 				std::string prefix = get_log_entry_prefix(_log_stream.str());
-				_log_stream << prefix;
-				_new_entry = false;
+				std::thread::id this_id = std::this_thread::get_id();
+
+				_log_stream << prefix << " " << this_id << " ";
+				_flushed = false;
 			}
 
 			_log_stream << output;
@@ -64,7 +66,7 @@ public:
 			if (manip == static_cast<ManipFn>(std::flush)
 			 || manip == static_cast<ManipFn>(std::endl)) {
 				this->flush();
-				_new_entry = true;
+				_flushed = true;
 			}
 		}
 
@@ -111,8 +113,10 @@ private:
 	// log level. Binary logic.
         int _log_filter = LogLevel::INFO;
 
-	// Used to detect if we should append the prefix to the entry or not
-	bool _new_entry = true;
+	// Have we flushed the current log stream ?
+	bool _flushed = false;
+
+	std::mutex _mutex;
 
 	// Our log message outputters chain
 	// We dispatch the actual log messages to these in sequential order
@@ -134,6 +138,9 @@ public:
 	// This will write the current log entry to the destination output, ensuring that
 	// the output is flushed also
 	virtual bool write_log_entry(const std::string &log_entry, int log_level) = 0;
+
+protected:
+	std::mutex _mutex;
 
 	//virtual void clear_log();
 };

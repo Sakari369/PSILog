@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#include <thread>
+#include <mutex>
 
 #include "logger.h"
 
@@ -17,6 +19,7 @@ Logger::~Logger() {
 void Logger::flush() {
 	// Dispatch the log entry to all of our outputters
 	// This operation will make sure the message is flushed also to the destination stream also
+
 	for (const auto &outputter : _outputters) {
 		outputter->write_log_entry(_log_stream.str(), _log_level);
 	}
@@ -75,6 +78,8 @@ LoggerConsoleOutput::~LoggerConsoleOutput() {
 
 // Write the the log entry to console
 bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry, int log_level) {
+	//std::lock_guard<std::mutex> guard(_mutex);
+
 	if (log_level == Logger::ERR) {
 		std::cerr << log_entry;
 		std::cerr.flush();
