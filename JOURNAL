@@ -305,4 +305,16 @@ Maybe add that to the list of TODO items.
 
 Just add a timestamp for now
 
+In order to implement the functionality described in the code above in a thread safe manner we need to instantiate an object whose life span is contained within only the log line. When the temporary object is destroyed the constructed log message is passed to the “main logger” object which takes care of thread safety.
+
+So, we could write a wrapper object around our logger, which creates a temporary object, that when has the input finished, will then pass to the actual logger..
+
+This way the objects are contained within only those threads that we create, and when the object is destroyed within that thread, then the actual logger will log that message.
+
+http://www.vilipetek.com/2014/04/17/thread-safe-simple-logger-in-c11/
+
+This way different threads are not accessing the same object, but are creating temporary log objects within that thread, and when the thread destroyes, those messages ar ethen handled.
+Simple!
+
+How do we implement this then ?
 
