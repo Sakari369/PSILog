@@ -40,15 +40,15 @@ public:
 
 	// Public methods
 
+	// The main logging method
 	void log(const std::string &entry, int log_level);
 
-	// Flush the output to our output class
-	//void flush();
-
+	// Return the log message prefix header
 	std::string get_log_entry_prefix(const std::string &log_entry) const;
 
 	// Add new logger to our output chain
-	// Basically we would like to own this as an unique_ptr
+	// We have multiple output destinations which implement the actual writing of the messages
+	// This enables easy extending of log destinations by the user
 	bool add_output(unique_ptr<LoggerOutput> output);
 
         // Accessors
@@ -92,53 +92,11 @@ public:
 	{}
 
 	~LogStream() {
-		_logger.log(str(), _log_level);
-	}
-
-	/*
-	template<class T>
-	Logger& operator << (const T& output) {
-		std::stringstream entry;
-
-		if (_log_level & _log_filter) {
-			entry << output;
-			log(entry.str());
+		// Filter log messages with the binary arithmetic mask
+		if (_logger.get_log_filter() & _log_level) {
+			_logger.log(str(), _log_level);
 		}
-
-		return *this;
 	}
-	*/
-
-	// Manipulation functions, endl, flush, setw etc
-	/*
-	typedef std::ostream& (*ManipFn)(std::ostream &);
-	Logger& operator << (ManipFn manip) {
-		if (_log_level & _log_filter) {
-			// Apply the string operation
-			manip(_log_stream);
-
-			// Should we flush the log stream ?
-			// This will signal the underlying outputters to flush the output to whatever
-			// they are writing it to
-			if (manip == static_cast<ManipFn>(std::flush)
-			 || manip == static_cast<ManipFn>(std::endl)) {
-				this->flush();
-			}
-		}
-
-		return *this;
-	}
-
-	// For setiosflags, resetiosflags
-	typedef std::ios_base& (*FlagsFn)(std::ios_base &);
-	Logger& operator << (FlagsFn manip) {
-		if (_log_level & _log_filter) {
-			manip(_log_stream);
-		}
-
-		return *this;
-	}
-	*/
 
 private:
 	Logger &_logger;

@@ -39,7 +39,8 @@ int main(int argc, char *argv[]) {
 
 	// Set filtering level, binary arithmetic
 	//logger.set_log_filter(Logger::INFO | Logger::WARN | Logger::ERR);
-	logger.set_log_filter(Logger::ALL);
+	//logger.set_log_filter(Logger::ALL);
+	logger.set_log_filter(Logger::INFO);
 
 	// TODO: would be it more clear to do the move insde add_output ?
 	logger.add_output(move(make_unique<LoggerConsoleOutput>()));
