@@ -35,6 +35,18 @@ TEST_CASE("Logger", "Test the logger interface") {
 		REQUIRE_THAT( dest.str(), Catch::EndsWith("Testing\n", Catch::CaseSensitive::Yes) );
 	}
 
+	SECTION("Filtering") {
+		std::ostringstream dest;
+		logger.add_output(move(make_unique<LoggerStringOutput>(dest)));
+		logger.set_log_filter(Logger::ERR | Logger::WARN);
+
+		logger(Logger::INFO) << "Testing\n";
+		REQUIRE_THAT( dest.str(), Catch::Equals("", Catch::CaseSensitive::Yes) );
+
+		logger(Logger::ERR) << "Error msg!\n";
+		REQUIRE_THAT( dest.str(), Catch::EndsWith("Error msg!\n", Catch::CaseSensitive::Yes) );
+	}
+
 	/*
 	SECTION("Console output") {
 		logger.add_output(move(make_unique<LoggerConsoleOutput>()));
@@ -42,9 +54,7 @@ TEST_CASE("Logger", "Test the logger interface") {
 	}
 	*/
 
-	/*
 	SECTION("File output") {
 		logger.add_output(move(make_unique<LoggerFileOutput>("/tmp/log_test.txt")));
 	}
-	*/
 }
