@@ -318,3 +318,11 @@ Simple!
 
 How do we implement this then ?
 
+Nice, now we have thread safety.
+
+
+Fri Apr 13 11:36:55 EEST 2018
+============================
+
+Fix the logging level filtering to happen on the stream now ?
+
