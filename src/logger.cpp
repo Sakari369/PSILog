@@ -1,3 +1,11 @@
+// Logger.cpp
+//
+// RightWare logger assignment
+// Class for handling logging, with support for multiple outputs, thread safety and modular extensions of
+// user configurable output destinations
+//
+// Copyright (c) 2018 Sakari Lehtonen <sakari AT psitriangle DOT net>
+
 #include <assert.h>
 #include <iomanip>
 #include <ctime>
@@ -7,18 +15,10 @@
 
 #include "logger.h"
 
-Logger::Logger() {
-	//std::cout << "Logger created" << std::endl;
-}
-
-Logger::~Logger() {
-	//std::cout << "Logger destroyed" << std::endl;
-}
-
 // Default logger() << "Log message" overriding
 // Override the Logger functor operator, to return a LogStream that
 // references this logger. This way the the operations are thread safe, as
-// this temporary LogStream will call the actual log() operation when it is destroyed
+// this temporary LogStream stringstream will call the actual log() operation when it is destroyed
 LogStream Logger::operator ()() {
 	return LogStream(*this, LogLevel::INFO);
 }
@@ -81,15 +81,6 @@ void Logger::set_log_filter(int log_filter) {
 	_log_filter = log_filter;
 }
 
-// Default console output implementation
-LoggerConsoleOutput::LoggerConsoleOutput() {
-	//fprintf(stderr, "Initialized ConsoleOutput\n");
-}
-
-LoggerConsoleOutput::~LoggerConsoleOutput() {
-	//fprintf(stderr, "Destroyed ConsoleOutput\n");
-}
-
 // Write the the log entry to console
 bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry, int log_level) {
 	// Log errors to stderr
@@ -119,7 +110,7 @@ LoggerFileOutput::~LoggerFileOutput() {
 
 // Write the the log entry to our file
 bool LoggerFileOutput::write_log_entry(const std::string &log_entry, int log_level) {
-	// The operations should be thread safe, but let's just make sure
+	// The operations should already be thread safe, but let's just make sure
 	// file operations are guarded behind a mutex
 	std::lock_guard<std::mutex> guard(_mutex);
 

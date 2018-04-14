@@ -1,5 +1,10 @@
 // Logger.h
-// A logger class
+//
+// RightWare logger assignment
+// Class for handling logging, with support for multiple outputs, thread safety and modular extensions of
+// user configurable output destinations
+//
+// Copyright (c) 2018 Sakari Lehtonen <sakari AT psitriangle DOT net>
 
 #include <iostream>
 #include <sstream>
@@ -8,7 +13,7 @@
 #include <vector>
 #include <stdio.h>
 
-// Implementation for C++11
+// std::make_unique template implementation for C++11
 #include "make_unique.h"
 
 using std::unique_ptr;
@@ -19,6 +24,7 @@ class LoggerOutput;
 class LoggerConsoleOutput;
 class LogStream;
 
+// Our main logger class
 class Logger {
 
 public:
@@ -31,8 +37,8 @@ public:
 		ALL	= (2 << 3) - 1
         };
 
-        Logger();
-        ~Logger();
+	Logger() = default;
+	~Logger() = default;
 
 	// Functors for returning a log stream
 	LogStream operator ()();
@@ -78,6 +84,9 @@ private:
 };
 
 // Stream class for thread safety
+// The Logger class () functor returns actually a reference to this, so we can stream the
+// log messages to this temporary object, that calls the logger.log() when this is destroyed
+// in the context it was created, preventing multiple threads from writing to the logger at the same time
 class LogStream : public std::ostringstream {
 public:
 	// Store reference to the current log level and logger object
@@ -103,29 +112,25 @@ private:
 	int _log_level;
 };
 
-// Super class for implementing logger outputs
+// Base class for implementing logger outputs
+// This allows modular extension of the outputs by the user,
+// Just provide an implementatin extending this class, and call add_output()
 class LoggerOutput {
 public:
 	LoggerOutput() = default;
 	~LoggerOutput() = default;
 
-	// TODO: maybe use a struct for the log entry
-
 	// This will write the current log entry to the destination output, ensuring that
 	// the output is flushed also
+	// TODO: maybe use a struct for the log entry
 	virtual bool write_log_entry(const std::string &log_entry, int log_level) = 0;
-
-protected:
-	std::mutex _mutex;
-
-	//virtual void clear_log();
 };
 
 // Default implementation of outputting log messages to the console
 class LoggerConsoleOutput : public LoggerOutput {
 public:
-	LoggerConsoleOutput();
-	~LoggerConsoleOutput();
+	LoggerConsoleOutput() = default;
+	~LoggerConsoleOutput() = default;
 
 	bool write_log_entry(const std::string &log_entry, int log_level) override;
 };
@@ -141,4 +146,5 @@ public:
 private:
 	const char *_output_path = "";
 	std::fstream _fs;
+	std::mutex _mutex;
 };
