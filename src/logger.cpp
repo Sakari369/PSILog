@@ -34,23 +34,29 @@ LogStream Logger::operator ()(int log_level) {
 // overwrite the formatting
 void Logger::log(const std::string &entry, int log_level) {
 	std::stringstream entry_ss;
-	std::string prefix = get_log_entry_prefix(entry);
-	std::thread::id thread_id = std::this_thread::get_id();
 
-	entry_ss << prefix << "[" << thread_id << "] " << entry;
+	// Insert the prefix in the beginning of the entry
+	std::string prefix = get_log_entry_prefix(entry);
+	entry_ss << prefix << entry;
+
+	// Write to all of our outputs
 	for (const auto &outputter : _outputters) {
 		outputter->write_log_entry(entry_ss.str(), log_level);
 	}
 }
 
+// Get the default log entry prefix, return a timestamp for now
+// TODO: provide a way for the user to override this method, to implement custom
+// prefixes easily
 std::string Logger::get_log_entry_prefix(const std::string &log_entry) const {
 	std::string formatted;
 	std::stringstream ss;
+	std::thread::id thread_id = std::this_thread::get_id();
 
-	// Append time to the entry
+	// Append time and current thread id to the entry
 	auto t = std::time(nullptr);
 	auto tm = *std::localtime(&t);
-	ss << std::put_time(&tm, "[%H:%M:%S] ");
+	ss << std::put_time(&tm, "[%H:%M:%S] ") << "[" << thread_id << "] ";
 
 	return ss.str();
 }
