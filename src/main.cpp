@@ -47,7 +47,8 @@ int main(int argc, char *argv[]) {
 	// Set filtering level, binary arithmetic
 	//logger.set_log_filter(Logger::INFO | Logger::WARN | Logger::ERR);
 	//logger.set_log_filter(Logger::ALL);
-	logger.set_log_filter(Logger::INFO);
+	//logger.set_log_filter(Logger::INFO);
+	logger.set_log_filter(Logger::ALL);
 
 	// Add console and file outputters
 	// We create these here and move, so that ownership is clear
