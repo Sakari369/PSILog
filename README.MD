@@ -66,7 +66,7 @@ Run `./run_tests` to run the tests
 Some design principles and notes behind this programming assignment :) 
 This is a pretty simple project, but these things apply on both big and small scale. 
 
-The design was started with the quesiton: "How would the user use this API ?"
+The design was started with the question: "How would the user use this API ?"
 
 This way the implementation is based on the usage. 
 This is also a good way to get a clear view immediately what the code requires, what kind of parameters are needed etc.
