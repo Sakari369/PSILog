@@ -93,10 +93,11 @@ Here are some of the rationale behind my coding conventions:
 On every project I work on, I keep a journal, where I solve the problem first on theory level only, if it's anything non-trivial.
 This also helps me to get back to any details I've solved once, and keep my head and local memory clean.
 
-This project was implemented using modern C++ practices, using mostly QT Creator with VIM -keybindings, and also VIM from the commandline.
+This project was implemented using modern C++ practices, using mostly QT Creator with VIM -keybindings, and also a highly customized MacVIM environment.
 The cmake was added so that QT Creator can manage the project, and also because it's the easiest way to generate multiplatform makefiles.
 
 For testing, I used the excellent Catch2 library, letting me to focus on the core concepts.
+This was a fun assignment to implement, I wrote this partly to replace my simpler logging code in my current C++ projects.
 
 ## Future features and ideas how to improve the current version
 
@@ -107,3 +108,4 @@ TODO:
  * Support customizing the log prefix easily
  * Write tests for multithreading safety, didn't have time to get them working properly, but according to implementation in main.cpp
    usage is thread safe.
+ * Handle actual buffer file writing in another thread, resulting in non-locking log calls

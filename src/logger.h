@@ -28,6 +28,7 @@ class LogStream;
 class Logger {
 
 public:
+	// Binary arithmetic current log level mask
         enum LogLevel {
 		NONE	=  0,
 		INFO	=  1,
@@ -40,7 +41,7 @@ public:
 	Logger() = default;
 	~Logger() = default;
 
-	// Functors for returning a log stream
+	// Functors for returning a log stream, enabling multithreading safe logging
 	LogStream operator ()();
 	LogStream operator ()(int log_level);
 
@@ -58,11 +59,11 @@ public:
 	// Flush all output now to the destination outputs
 	void flush();
 
-        // Accessors
+	// Pure accessors written here for easier implementation
         int get_log_level() const { return _log_level; }
         void set_log_level(int log_level) { _log_level = log_level; }
 
-        int get_log_filter() const { return _log_filter; }
+	int get_log_filter() const { return _log_filter; }
         void set_log_filter(int log_filter) { _log_filter = log_filter; }
 
 	bool get_add_prefix() const { return _add_prefix; }
@@ -85,9 +86,13 @@ private:
 };
 
 // Stream class for thread safety
-// The Logger class () functor returns actually a reference to this, so we can stream the
-// log messages to this temporary object, that calls the logger.log() when this is destroyed
-// in the context it was created, preventing multiple threads from writing to the logger at the same time
+// Temporary instance of this class is returned when
+// logger() << "Log entry" << std::endl;
+// Or the << operation is called
+// Meaning the calling thread gets a temporary LogStream object
+// And when in the calling thread the object is destroyed, it actually logs the log messages
+// This enables thread safe log message construction, without multiple threads intefering
+// with each other
 class LogStream : public std::ostringstream {
 public:
 	// Store reference to the current log level and logger object
@@ -112,6 +117,8 @@ private:
 	Logger &_logger;
 	int _log_level;
 };
+
+// The logger outputs to LoggerOutput objects
 
 // Base class for implementing logger outputs
 // This allows modular extension of the outputs by the user,
