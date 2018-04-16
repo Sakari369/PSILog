@@ -44,6 +44,15 @@ private:
 int main(int argc, char *argv[]) {
 	Logger logger;
 
+	std::string log_path;
+	if (argc >= 2) {
+		log_path = std::string(argv[1]);
+	} else {
+		log_path = "logger_test.txt";
+	}
+
+	std::cerr << "Outputting to " << log_path << std::endl;
+
 	// Set filtering level, binary arithmetic
 	//logger.set_log_filter(Logger::INFO | Logger::WARN | Logger::ERR);
 	//logger.set_log_filter(Logger::ALL);
@@ -53,7 +62,8 @@ int main(int argc, char *argv[]) {
 	// Add console and file outputters
 	// We create these here and move, so that ownership is clear
 	logger.add_output(move(make_unique<LoggerConsoleOutput>()));
-	logger.add_output(move(make_unique<LoggerFileOutput>("/tmp/log_test.txt")));
+	logger.add_output(move(make_unique<LoggerFileOutput>(log_path.c_str())));
+	//logger.set_add_prefix(false);
 
 	// Example idea of how to log into a network service
 	//logger.add_output(move(make_unique<LoggerXhrOutput>("https://127.0.0.1:3000/log", auth_info);
@@ -91,7 +101,6 @@ int main(int argc, char *argv[]) {
 
 	logger(Logger::INFO)  << "All phasers stabilized" << std::endl;
 	logger(Logger::INFO)  << "Shutting down all systems ..." << std::endl;
-
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 	logger(Logger::INFO)  << "Shutdown complete" << std::endl;
 
