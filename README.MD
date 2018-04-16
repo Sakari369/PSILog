@@ -27,18 +27,18 @@ Include the `logger.h` in your code, and add `logger.cpp` into your project comp
 ### Code Example
 
 ```cpp
-	Logger logger;
+Logger logger;
 
-	logger.set_log_filter(Logger::INFO | Logger::WARN | Logger::ERR);
+logger.set_log_filter(Logger::INFO | Logger::WARN | Logger::ERR);
 
-	logger.add_output(move(make_unique<LoggerConsoleOutput>()));
-	logger.add_output(move(make_unique<LoggerFileOutput>("/tmp/log_test.txt")));
+logger.add_output(move(make_unique<LoggerConsoleOutput>()));
+logger.add_output(move(make_unique<LoggerFileOutput>("/tmp/log_test.txt")));
 
-	logger(Logger::INFO) << "All systems initialized" << std::endl;
-	logger(Logger::WARN) << "WARNING: Phasers damaged" << std::endl;
-	logger.flush(); // force flushing of output
+logger(Logger::INFO) << "All systems initialized" << std::endl;
+logger(Logger::WARN) << "WARNING: Phasers damaged" << std::endl;
+logger.flush(); // force flushing of output
 
-	logger(Logger::ERR)  << "ERROR: Failed to boot phasers" << std::endl;
+logger(Logger::ERR)  << "ERROR: Failed to boot phasers" << std::endl;
 ```
 
 ## Compiling
@@ -58,29 +58,45 @@ From there you can run make to compile the project.
 ## Running
 
 Run `./RightwareLogger` to run a test implementation
+
 Run `./run_tests` to run the tests
 
-## Design principles and personal preferences in code style
+## Some notes from the author
 
-Some design principles and notes behind this programming assignment :) This is a pretty simple project, but these things apply on both big and small scale. The design was started from the view of how would the user use this API ?
+Some design principles and notes behind this programming assignment :) 
+This is a pretty simple project, but these things apply on both big and small scale. 
 
-This way the implementation is based on the usage. This is also a good way to get a clear view immediately what the code requires to be implemented, what kind of parameters and other stuff you need to pass to it and so on, and you get to use it right away, iterating on the usage immediately.
+The design was started with the quesiton: "How would the user use this API ?"
 
-I feel it's important to create simple and predictable code, that you can figure out logically how it works, without having to look at the documentation too much. Readability is also very important, that you can parse the code fast when reading it, making sense of what is happening when we call this function for example.
+This way the implementation is based on the usage. 
+This is also a good way to get a clear view immediately what the code requires, what kind of parameters are needed etc.
 
-Modularity is also a big thing, how to design code that can be plugged into existing code in a way that is not hardwired, and how to write code that can be extendable and used in many situations. And at the same time keeping in mind, that it's better to first implement with a simple implementation, and then re-factor to be more modular when need raises, getting to working solutions fast without spending too much time up front figuring out a over-generalized or optimized solution.
+First I thought about making the logger more functional, but decided that since the requirement was C++ only, it was okay to use the stringstream << approach, which works nicely.
+And if you need to interface this from C/Lua or whatever, proxy methods can be built later.
 
-Here is some of the rationale behind my coding conventions and ways I have found to be effective:
+I feel it's important to create simple and predictable code. 
+Readability is also very important, the ability to parse the code fast when reading it.
 
-* Always aim for human readable code, eg. keep one operation per line of code if possible
+Modularity is also a big thing, how to design code, that can be plugged into existing code in a way that is not hardwired. 
+And at the same time keeping in mind, that it's better to first implement with a simple implementation, and then re-factor to be more modular when need raises.
+
+Here are some of the rationale behind my coding conventions:
+
+* Always aim for human readable code
+* If it looks too complicated, it probably is
 * Easy to read and understand function and variable names.
 * Logical and consistent naming conventions. eg. set_surface_color(surface_color)
-* I use snake_case for variable names and methods, it has been studied that the brain will automatically replace _ with a space
-* Same thing for member variables, _member is available with modern compilers
+* I use snake_case for variable names and methods, easier to read vs camelCaseVariables
+* Member private variables start with _, eg. _member
 * Comment the code, and update comments when functionality changes. 
-* I always keep a journal, where I solve the problem first on paper, then move into implementation, if the problem is anything but trivial
 
-The target environment to be used was C++11, leveraging modern features like unique pointers and using stream overriding to handle the logging, as to support the native way C++ developers have used to, and at the same time easily supporting logging user defined types, by just overriding the << operator in the user defined type, again conforming to modern C++ practices.
+On every project I work on, I keep a journal, where I solve the problem first on theory level only, if it's anything non-trivial.
+This also helps me to get back to any details I've solved once, and keep my head and local memory clean.
+
+This project was implemented using modern C++ practices, using mostly QT Creator with VIM -keybindings, and also VIM from the commandline.
+The cmake was added so that QT Creator can manage the project, and also because it's the easiest way to generate multiplatform makefiles.
+
+For testing, I used the excellent Catch2 library, letting me to focus on the core concepts.
 
 ## Future features and ideas how to improve the current version
 
