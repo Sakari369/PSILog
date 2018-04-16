@@ -61,7 +61,10 @@ From there you can run make to compile the project.
 
 Run `./RightwareLogger` to run a test implementation
 
+## Running the tests
+
 Run `./run_tests` to run the tests
+Use `./run_tests -s` to see all the succesfull tests
 
 ## Some notes from the author
 
