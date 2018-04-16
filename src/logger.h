@@ -44,8 +44,6 @@ public:
 	LogStream operator ()();
 	LogStream operator ()(int log_level);
 
-	// Public methods
-
 	// The main logging method
 	void log(const std::string &entry, int log_level);
 
@@ -55,35 +53,35 @@ public:
 	// Add new logger to our output chain
 	// We have multiple output destinations which implement the actual writing of the messages
 	// This enables easy extending of log destinations by the user
-	bool add_output(unique_ptr<LoggerOutput> output);
+	void add_output(unique_ptr<LoggerOutput> output);
 
 	// Flush all output now to the destination outputs
 	void flush();
 
         // Accessors
-        int get_log_level() const;
-        void set_log_level(int log_level);
+        int get_log_level() const { return _log_level; }
+        void set_log_level(int log_level) { _log_level = log_level; }
 
-        int get_log_filter() const;
-        void set_log_filter(int log_filter);
+        int get_log_filter() const { return _log_filter; }
+        void set_log_filter(int log_filter) { _log_filter = log_filter; }
+
+	bool get_add_prefix() const { return _add_prefix; }
+	void set_add_prefix(bool add_prefix) { _add_prefix = add_prefix; }
 
 private:
 	// The current log level we are logging messages with
         int _log_level = LogLevel::INFO;
 
 	// The log filter that filters the output, compared against the current
-	// log level. Binary logic.
+	// log level. Binary arithmetic mask.
         int _log_filter = LogLevel::INFO;
 
-	std::mutex _mutex;
+	// Do we add the log message prefix to our entries ?
+	bool _add_prefix = true;
 
 	// Our log message outputters chain
 	// We dispatch the actual log messages to these in sequential order
-	// TODO: We should also have a default outputter if none is assigned that outputs to the console
 	std::vector<unique_ptr<LoggerOutput>> _outputters;
-
-	// The stream where we buffer our log messages until flushing
-	//std::stringstream _log_stream;
 };
 
 // Stream class for thread safety
@@ -125,8 +123,9 @@ public:
 
 	// This will write the current log entry to the destination output, ensuring that
 	// the output is flushed also
-	// TODO: maybe use a struct for the log entry
 	virtual bool write_log_entry(const std::string &log_entry, int log_level) = 0;
+
+	// Provide a way to implement flushing the output manually
 	virtual void flush() = 0;
 };
 

@@ -30,24 +30,25 @@ LogStream Logger::operator ()(int log_level) {
 }
 
 // Apply formatting and dispatch the log message to all of our outputs
-// TODO: maybe split the formatting from the actual writing, so user could easily
-// overwrite the formatting
 void Logger::log(const std::string &entry, int log_level) {
 	std::stringstream entry_ss;
 
 	// Insert the prefix in the beginning of the entry
-	std::string prefix = get_log_entry_prefix(entry);
-	entry_ss << prefix << entry;
+	if (get_add_prefix() == true) {
+		std::string prefix = get_log_entry_prefix(entry);
+		entry_ss << prefix << entry;
+	} else {
+		entry_ss << entry;
+	}
+
+	// Add default output if we don't have any outputters
+	if (_outputters.size() == 0) {
+		add_output(move(make_unique<LoggerConsoleOutput>()));
+	}
 
 	// Write to all of our outputs
 	for (const auto &outputter : _outputters) {
 		outputter->write_log_entry(entry_ss.str(), log_level);
-	}
-}
-
-void Logger::flush() {
-	for (const auto &outputter : _outputters) {
-		outputter->flush();
 	}
 }
 
@@ -67,32 +68,20 @@ std::string Logger::get_log_entry_prefix(const std::string &log_entry) const {
 	return ss.str();
 }
 
+// Message all of our outputters to flush their output
+void Logger::flush() {
+	for (const auto &outputter : _outputters) {
+		outputter->flush();
+	}
+}
+
 // Add output destination to our chain of outputs
-// TODO: do we use return value ?
-bool Logger::add_output(std::unique_ptr<LoggerOutput> output) {
+void Logger::add_output(std::unique_ptr<LoggerOutput> output) {
 	assert(output != nullptr);
 	_outputters.push_back(std::move(output));
-
-	return true;
 }
 
-// Set the currently active log level for logging messages
-void Logger::set_log_level(int log_level) {
-	_log_level = log_level;
-}
-
-int Logger::get_log_level() const {
-	return _log_level;
-}
-
-int Logger::get_log_filter() const {
-	return _log_filter;
-}
-
-void Logger::set_log_filter(int log_filter) {
-	_log_filter = log_filter;
-}
-
+// Default console output implementation
 // Write the the log entry to console
 bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry, int log_level) {
 	// Log errors to stderr
