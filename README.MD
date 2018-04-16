@@ -6,6 +6,8 @@ The design principles for this library have been simplicity of use and flexibili
 Builtin with support for logging into console or files, it supports chaining log messages into multiple outputs.
 Extending outputters is also easy, the user can write their own log message output destination and add to the chain.
 
+Copyright (C) 2018 Sakari Lehtonen <sakari AT psitriangle DOT net>
+
 ## Features
 
 * Implemented with cross-platform C++11
