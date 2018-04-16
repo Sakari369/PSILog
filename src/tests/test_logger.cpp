@@ -8,6 +8,7 @@
 
 #include <fstream>
 #include <cstdio>
+#include <thread>
 
 #include "catch.hpp"
 #include "../logger.h"
@@ -35,7 +36,7 @@ private:
 
 TEST_CASE("Logger", "Test the logger interface") {
 	Logger logger;
-	std::string log_path = "/tmp/logger_test.txt";
+	std::string log_path = "logger_tests.txt";
 
 	// Delete our log file if one exists, so we can start from a clean slate
 	std::ifstream fs(log_path.c_str());
