@@ -24,7 +24,21 @@ Copyright (C) 2018 Sakari Lehtonen <sakari AT psitriangle DOT net>
 
 ## Usage
 
-Include the `logger.h` in your code, and add `logger.cpp` into your project compilation.
+Include the `logger.h` in your code, and add `logger.cpp` into your project target objects.
+
+## Compiling
+
+(From the root directory)
+
+```
+mkdir build
+cd build
+cmake ..
+make
+```
+
+This will generate the Makefile in the build directory.
+From there you can run make to compile the project.
 
 ### Code Example
 
@@ -42,20 +56,6 @@ logger.flush(); // force flushing of output
 
 logger(Logger::ERR)  << "ERROR: Failed to boot phasers" << std::endl;
 ```
-
-## Compiling
-
-(From the root directory)
-
-```
-mkdir build
-cd build
-cmake ..
-make
-```
-
-This will generate the Makefile in the build directory.
-From there you can run make to compile the project.
 
 ## Running
 
