@@ -59,12 +59,12 @@ From there you can run make to compile the project.
 
 ## Running
 
-Run `./RightwareLogger` to run a test implementation
+Execute `./RightwareLogger` to run a test implementation
 
 ## Running the tests
 
-Run `./run_tests` to run the tests
-Use `./run_tests -s` to see all the succesfull tests
+Execute `./run_tests` to run the tests
+`./run_tests -s` shows all passed tests
 
 ## Some notes from the author
 
