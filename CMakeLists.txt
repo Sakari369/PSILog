@@ -11,15 +11,15 @@ set(SOURCES
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 # Testing
-set(CATCH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/testing)
+set(CATCH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/tests)
 add_library(Catch INTERFACE)
 target_include_directories(Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 # Make test executable
 set(TEST_SOURCES
-	src/testing/test_logger.cpp
+	src/tests/test_logger.cpp
 	src/logger.cpp
 )
 
-add_executable(test_logger ${TEST_SOURCES})
-target_link_libraries(test_logger Catch)
+add_executable(run_tests ${TEST_SOURCES})
+target_link_libraries(run_tests Catch)
