@@ -45,6 +45,12 @@ void Logger::log(const std::string &entry, int log_level) {
 	}
 }
 
+void Logger::flush() {
+	for (const auto &outputter : _outputters) {
+		outputter->flush();
+	}
+}
+
 // Get the default log entry prefix, return a timestamp for now
 // TODO: provide a way for the user to override this method, to implement custom
 // prefixes easily
@@ -101,6 +107,11 @@ bool LoggerConsoleOutput::write_log_entry(const std::string &log_entry, int log_
 	return true;
 }
 
+void LoggerConsoleOutput::flush() {
+	std::cerr.flush();
+	std::cout.flush();
+}
+
 // Default file output implementation
 LoggerFileOutput::LoggerFileOutput(const char *output_path) {
 	//fprintf(stderr, "Initialized FileOutput with output_path = %s\n", output_path);
@@ -112,6 +123,10 @@ LoggerFileOutput::LoggerFileOutput(const char *output_path) {
 
 LoggerFileOutput::~LoggerFileOutput() {
 	_fs.close();
+}
+
+void LoggerFileOutput::flush() {
+	_fs.flush();
 }
 
 // Write the the log entry to our file

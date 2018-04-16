@@ -57,6 +57,9 @@ public:
 	// This enables easy extending of log destinations by the user
 	bool add_output(unique_ptr<LoggerOutput> output);
 
+	// Flush all output now to the destination outputs
+	void flush();
+
         // Accessors
         int get_log_level() const;
         void set_log_level(int log_level);
@@ -124,6 +127,7 @@ public:
 	// the output is flushed also
 	// TODO: maybe use a struct for the log entry
 	virtual bool write_log_entry(const std::string &log_entry, int log_level) = 0;
+	virtual void flush() = 0;
 };
 
 // Default implementation of outputting log messages to the console
@@ -133,6 +137,7 @@ public:
 	~LoggerConsoleOutput() = default;
 
 	bool write_log_entry(const std::string &log_entry, int log_level) override;
+	void flush() override;
 };
 
 // Default implementation of outputting to a file
@@ -142,6 +147,7 @@ public:
 	~LoggerFileOutput();
 
 	bool write_log_entry(const std::string &log_entry, int log_level) override;
+	void flush() override;
 
 private:
 	const char *_output_path = "";
