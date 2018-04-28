@@ -1,6 +1,5 @@
 // PSILog.cpp
 //
-// RightWare logger assignment
 // Class for handling logging, with support for multiple outputs, thread safety and modular extensions of
 // user configurable output destinations
 //
