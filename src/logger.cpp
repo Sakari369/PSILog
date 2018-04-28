@@ -42,12 +42,12 @@ void PSILog::log(const std::string &entry, int log_level) {
 	}
 
 	// Add default output if we don't have any outputters
-	if (_outputters.size() == 0) {
+	if (_outputs.size() == 0) {
 		add_output(make_unique<PSILogConsoleOutput>());
 	}
 
 	// Write to all of our outputs
-	for (const auto &outputter : _outputters) {
+	for (const auto &outputter : _outputs) {
 		outputter->write_log_entry(entry_ss.str(), log_level);
 	}
 }
@@ -70,7 +70,7 @@ std::string PSILog::get_log_entry_prefix(const std::string &log_entry) const {
 
 // Message all of our outputters to flush their output
 void PSILog::flush() {
-	for (const auto &outputter : _outputters) {
+	for (const auto &outputter : _outputs) {
 		outputter->flush();
 	}
 }
@@ -78,7 +78,7 @@ void PSILog::flush() {
 // Add output destination to our chain of outputs
 void PSILog::add_output(std::unique_ptr<PSILogOutput> output) {
 	assert(output != nullptr);
-	_outputters.push_back(std::move(output));
+	_outputs.push_back(std::move(output));
 }
 
 // Default console output implementation

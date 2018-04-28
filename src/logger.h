@@ -79,7 +79,7 @@ private:
 
 	// Our log message outputters chain
 	// We dispatch the actual log messages to these in sequential order
-	std::vector<unique_ptr<PSILogOutput>> _outputters;
+	std::vector<unique_ptr<PSILogOutput>> _outputs;
 };
 
 // Stream class for thread safety
