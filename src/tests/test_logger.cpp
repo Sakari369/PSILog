@@ -16,10 +16,10 @@
 // Extending the logger output, so that records to the
 // stringstream we provide to this class, so we can test with a stringstream instead of
 // having to figure out how to capture console output
-class LoggerStringOutput : public LoggerOutput {
+class PSILogStringOutput : public PSILogOutput {
 public:
-	LoggerStringOutput(std::ostringstream &dest) : _dest(dest) {}
-	~LoggerStringOutput() = default;
+	PSILogStringOutput(std::ostringstream &dest) : _dest(dest) {}
+	~PSILogStringOutput() = default;
 
 	bool write_log_entry(const std::string &log_entry, int log_level) override {
 		_dest << log_entry;
@@ -34,9 +34,9 @@ private:
 	std::ostringstream &_dest;
 };
 
-TEST_CASE("Logger", "Test the logger interface") {
-	Logger logger;
-	std::string log_path = "logger_tests.txt";
+TEST_CASE("PSILog", "Test the logger interface") {
+	PSILog log;
+	std::string log_path = "log_tests.txt";
 
 	// Delete our log file if one exists, so we can start from a clean slate
 	std::ifstream fs(log_path.c_str());
@@ -52,46 +52,46 @@ TEST_CASE("Logger", "Test the logger interface") {
 
 	SECTION("Initialization") {
 		// Basic levels of logging should be these
-		REQUIRE( logger.get_log_filter() == Logger::INFO );
-		REQUIRE( logger.get_log_level() == Logger::INFO );
+		REQUIRE( log.get_filter() == PSILog::INFO );
+		REQUIRE( log.get_level() == PSILog::INFO );
 	}
 
 	SECTION("String output") {
 		std::ostringstream dest;
 
 		// Test output to a stringstream.
-		logger.add_output(move(make_unique<LoggerStringOutput>(dest)));
-		logger.set_log_filter(Logger::INFO);
+		log.add_output(move(make_unique<PSILogStringOutput>(dest)));
+		log.set_filter(PSILog::INFO);
 
-		logger(Logger::INFO) << "String output\n";
+		log(PSILog::INFO) << "String output\n";
 
 		REQUIRE_THAT( dest.str(), Catch::EndsWith("String output\n", Catch::CaseSensitive::Yes) );
 	}
 
 	SECTION("Filtering") {
 		std::ostringstream dest;
-		logger.add_output(move(make_unique<LoggerStringOutput>(dest)));
+		log.add_output(move(make_unique<PSILogStringOutput>(dest)));
 
 		// Set filter level so that the next log message wont go through
-		logger.set_log_filter(Logger::ERR | Logger::WARN);
+		log.set_filter(PSILog::ERR | PSILog::WARN);
 
-		logger(Logger::INFO) << "This is filtered\n";
+		log(PSILog::INFO) << "This is filtered\n";
 		REQUIRE_THAT( dest.str(), Catch::Equals("", Catch::CaseSensitive::Yes) );
 
-		logger(Logger::ERR) << "Error msg through the filter\n";
+		log(PSILog::ERR) << "Error msg through the filter\n";
 		REQUIRE_THAT( dest.str(), Catch::EndsWith("Error msg through the filter\n", Catch::CaseSensitive::Yes) );
 	}
 
 	SECTION("File output") {
-		logger.add_output(move(make_unique<LoggerFileOutput>(log_path.c_str())));
+		log.add_output(move(make_unique<PSILogFileOutput>(log_path.c_str())));
 
-		// Check that the LoggerFileOutput created the log file
+		// Check that the PSILogFileOutput created the log file
 		std::ifstream in(log_path.c_str());
 		REQUIRE( in.good() == true );
 		in.close();
 
-		logger(Logger::WARN) << "Warning that is not written" << std::endl;
-		logger(Logger::INFO) << "Info message to the file" << std::endl;
+		log(PSILog::WARN) << "Warning that is not written" << std::endl;
+		log(PSILog::INFO) << "Info message to the file" << std::endl;
 
 		// Read the contents back in
 		in.open(log_path.c_str());
