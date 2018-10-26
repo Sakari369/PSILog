@@ -1,6 +1,6 @@
-# Rightware Logger
+# PSILog
 
-Rightware Logger is a C++11 logger class that let's you easily and flexibly add logging support to your project.
+PSILog is a C++11 logger class that let's you easily and flexibly add logging support to your project.
 The design principles for this library have been simplicity of use and flexibility to suit any use case.
 
 Builtin with support for logging into console or files, it supports chaining log messages into multiple outputs.
