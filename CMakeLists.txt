@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(PSILogger)
+project(PSILog)
 set (CMAKE_CXX_STANDARD 14)
 
 set(SOURCES
         src/main.cpp
-	src/logger.cpp
+	src/PSILog.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -18,7 +18,7 @@ target_include_directories(Catch INTERFACE ${CATCH_INCLUDE_DIR})
 # Make test executable
 set(TEST_SOURCES
 	src/tests/test_logger.cpp
-	src/logger.cpp
+	src/PSILog.cpp
 )
 
 add_executable(run_tests ${TEST_SOURCES})

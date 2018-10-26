@@ -1,7 +1,6 @@
 // main.cpp
 //
-// RightWare logger assignment
-// Uses our logger class to log some messages and test out thread safety
+// Uses our logger class to log some messages and test out thread safety.
 //
 // Copyright (c) 2018 Sakari Lehtonen <sakari AT psitriangle DOT net>
 
@@ -10,7 +9,7 @@
 #include <chrono>
 #include <future>
 
-#include "logger.h"
+#include "PSILog.h"
 
 // A custom user type, for testing out logging user types
 class WarpDrive {

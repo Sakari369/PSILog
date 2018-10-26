@@ -1,6 +1,6 @@
 // test_logger.cpp
 //
-// RightWare logger tests, using Catch2 test framework
+// PSILog logger tests, using Catch2 test framework.
 //
 // Copyright (c) 2018 Sakari Lehtonen <sakari AT psitriangle DOT net>
 
@@ -11,7 +11,7 @@
 #include <thread>
 
 #include "catch.hpp"
-#include "../logger.h"
+#include "../PSILog.h"
 
 // Extending the logger output, so that records to the
 // stringstream we provide to this class, so we can test with a stringstream instead of

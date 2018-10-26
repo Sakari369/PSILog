@@ -12,7 +12,7 @@
 #include <thread>
 #include <mutex>
 
-#include "logger.h"
+#include "PSILog.h"
 
 // Default logger() << "Log message" overriding
 // Override the PSILog functor operator, to return a LogStream that
